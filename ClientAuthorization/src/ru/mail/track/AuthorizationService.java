@@ -1,6 +1,9 @@
 package ru.mail.track;
 
 
+import sun.security.util.Password;
+
+import javax.naming.NamingException;
 import java.io.IOException;
 import java.util.Scanner;
 
@@ -12,9 +15,6 @@ public class AuthorizationService {
         this.userStore = userStore;
     }
 
-    public AuthorizationService() {
-        this.userStore = new UserStore();
-    }
 
     void startAuthorization() {
         Scanner scanner = new Scanner(System.in);
@@ -23,18 +23,18 @@ public class AuthorizationService {
             String resp = scanner.next();
             if (resp.equals("n")) {
                 try {
-                    this.newUser();
+                    newUser();
                     System.out.println("New user was successfully created!");
                 } catch (IOException e) {
                     System.out.println("User with this name already exists, try another one");
                 }
             } else if (resp.equals("l")) {
                 try {
-                    User user = this.login();
+                    User user = login();
                     System.out.println("Hello " + user.getName() + " !");
-                } catch (IOException e) {
+                } catch (NamingException e) {
                     System.out.println("Wrong login!");
-                } catch (NullPointerException e) {
+                } catch (IOException e) {
                     System.out.println("Wrong password!");
                 }
             } else if (resp.equals("q")) {
@@ -44,23 +44,23 @@ public class AuthorizationService {
         }
     }
 
-    User login() throws IOException {
+    User login() throws IOException, NamingException {
         Scanner scanner = new Scanner(System.in);
         // 1. Ask for name
         System.out.println("Print you login here: ");
         String name = scanner.next();
         System.out.println("> " + name);
-        if (!this.userStore.isUserExist(name)) {
-            throw new IOException();
+        if (!userStore.isUserExist(name)) {
+            throw new NamingException();
         }
         // 2. Ask for pass
         System.out.println("Print you password here: ");
         String pass = scanner.next();
         System.out.println("> ");
 //            3. Ask UserStore for user:  userStore.getUser(name, pass)
-        User user = this.userStore.getUser(name, pass);
+        User user = userStore.getUser(name, pass);
         if (user == null) {
-            throw new NullPointerException();
+            throw new IOException();
         } else {
             return user;
         }
@@ -72,7 +72,7 @@ public class AuthorizationService {
         System.out.println("Print you login here: ");
         String name = scanner.next();
         System.out.println("> " + name);
-        if (this.userStore.isUserExist(name)) {
+        if (userStore.isUserExist(name)) {
             throw new IOException();
         }
         // 2. Ask for pass
