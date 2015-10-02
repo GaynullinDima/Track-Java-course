@@ -32,7 +32,6 @@ public class UserStore {
     // если есть, вернуть true
     boolean isUserExist(String name) {
         boolean flag = false;
-
         for (User user : this.Users) {
             if (user != null && user.getName().equals(name)) {
                 flag = true;
